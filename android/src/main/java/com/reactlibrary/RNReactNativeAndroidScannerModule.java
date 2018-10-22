@@ -78,23 +78,34 @@ public class RNReactNativeAndroidScannerModule extends ReactContextBaseJavaModul
 
         @Override
         public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-            if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-                Uri uri = data.getExtras().getParcelable(ScanConstants.SCANNED_RESULT);
-                Bitmap bitmap = null;
-                try {
-                    bitmap = MediaStore.Images.Media.getBitmap(getReactApplicationContext().getContentResolver(), uri);
-                    //getReactApplicationContext().getContentResolver().delete(uri, null, null);
-
+            if (requestCode == REQUEST_CODE) {
+                if (resultCode == Activity.RESULT_OK) {
+                    Uri uri = data.getExtras().getParcelable(ScanConstants.SCANNED_RESULT);
+                    Bitmap bitmap = null;
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(getReactApplicationContext().getContentResolver(), uri);
+                        //getReactApplicationContext().getContentResolver().delete(uri, null, null);
+    
+                        scannedResult = Arguments.createMap();
+                        scannedResult.putString ("uri", uri.toString());
+                        scannedResult.putBoolean ("didCancel", false);
+    
+    
+                        emitMessageToRN(getReactApplicationContext(), SCANNED_RESULT, scannedResult);
+                        Log.d(REACT_CLASS, "onActivitiyResult scan ReactNativeAndroidScanner ");
+                        // scannedImageView.setImageBitmap(bitmap);
+                    } catch (IOException e) {
+                    // scannedResult = Arguments.createMap();
+                    // scannedResult.putBoolean ("didCancel", true);
+                    // scannedResult.putString ("error", 'unknown error');
+                    // emitMessageToRN(getReactApplicationContext(), SCANNED_RESULT, scannedResult);                
+                        e.printStackTrace();
+                    }
+                } else {
                     scannedResult = Arguments.createMap();
-                    scannedResult.putString ("uri", uri.toString());
-
-
-                    emitMessageToRN(getReactApplicationContext(), SCANNED_RESULT, scannedResult);
-                    Log.d(REACT_CLASS, "onActivitiyResult scan ReactNativeAndroidScanner ");
-                    // scannedImageView.setImageBitmap(bitmap);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                    scannedResult.putBoolean ("didCancel", true);
+                    emitMessageToRN(getReactApplicationContext(), SCANNED_RESULT, scannedResult);                
+                }   
             }
         }
     };

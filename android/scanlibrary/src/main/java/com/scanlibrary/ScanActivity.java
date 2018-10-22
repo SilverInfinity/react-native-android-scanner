@@ -36,6 +36,17 @@ public class ScanActivity extends Activity implements IScanner, ComponentCallbac
     }
 
     @Override
+    public void onBackPressed() {
+        setResult(Activity.RESULT_CANCELED);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                finish();
+            }
+        });
+    }
+
+    @Override
     public void onBitmapSelect(Uri uri) {
         ScanFragment fragment = new ScanFragment();
         Bundle bundle = new Bundle();

@@ -16,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.media.ExifInterface;
+import android.graphics.Matrix;
 
 import java.io.File;
 import java.io.IOException;
@@ -180,6 +182,24 @@ public class PickImageFragment extends Fragment {
         Bitmap original
                 = BitmapFactory.decodeFileDescriptor(
                 fileDescriptor.getFileDescriptor(), null, options);
+
+        ExifInterface exif = new ExifInterface(selectedimg.getPath());
+        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 0);
+        Matrix matrix = new Matrix();
+        switch (orientation)
+        {
+            case 6:
+                matrix.postRotate(90);
+                break;
+            case 3:
+                matrix.postRotate(180);
+                break;
+            case 8:
+                matrix.postRotate(270);
+                break;
+        }
+        original = Bitmap.createBitmap(original, 0, 0, original.getWidth(), original.getHeight(), matrix, true);
+
         return original;
     }
 }

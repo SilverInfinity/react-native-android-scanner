@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.content.Intent;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -215,7 +216,22 @@ public class ScanFragment extends Fragment {
         protected Bitmap doInBackground(Void... params) {
             Bitmap bitmap =  getScannedBitmap(original, points);
             Uri uri = Utils.getUri(getActivity(), bitmap);
-            scanner.onScanFinish(uri);
+            // scanner.onScanFinish(uri);
+            try {
+                Intent data = new Intent();
+                data.putExtra(ScanConstants.SCANNED_RESULT, uri);
+                getActivity().setResult(Activity.RESULT_OK, data);
+                System.gc();
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dismissDialog();
+                        getActivity().finish();
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return bitmap;
         }
 

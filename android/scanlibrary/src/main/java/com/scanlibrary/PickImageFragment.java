@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.lang.Exception;
 
 /**
  * Created by jhansi on 04/04/15.
@@ -183,23 +184,31 @@ public class PickImageFragment extends Fragment {
                 = BitmapFactory.decodeFileDescriptor(
                 fileDescriptor.getFileDescriptor(), null, options);
 
-        ExifInterface exif = new ExifInterface(selectedimg.getPath());
-        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 0);
-        Matrix matrix = new Matrix();
-        switch (orientation)
-        {
-            case 6:
-                matrix.postRotate(90);
-                break;
-            case 3:
-                matrix.postRotate(180);
-                break;
-            case 8:
-                matrix.postRotate(270);
-                break;
+        try {
+            if (original == null) {
+                Thread.sleep(2000);
+                original = BitmapFactory.decodeFileDescriptor(
+                    fileDescriptor.getFileDescriptor(), null, options);
+            }
+            ExifInterface exif = new ExifInterface(selectedimg.getPath());
+                int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 0);
+                Matrix matrix = new Matrix();
+                switch (orientation)
+                {
+                    case 6:
+                        matrix.postRotate(90);
+                        break;
+                    case 3:
+                        matrix.postRotate(180);
+                        break;
+                    case 8:
+                        matrix.postRotate(270);
+                        break;
+                }
+                original = Bitmap.createBitmap(original, 0, 0, original.getWidth(), original.getHeight(), matrix, true);
+        } catch (Exception e) {
+            Log.w("Scanner", "Error rotating image" + e.toString());
         }
-        original = Bitmap.createBitmap(original, 0, 0, original.getWidth(), original.getHeight(), matrix, true);
-
         return original;
     }
 }
